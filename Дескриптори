@@ -1,0 +1,110 @@
+Домашнее задание
+1) Создайте дескриптор, который будет делать поля класса управляемые им
+доступными только для чтения.
+
+class My_descriptor:
+    def __init__(self):
+        pass
+
+    def __get__(self, instance_self, instance_class):
+        area = instance_self.length * instance_self.width
+        return area
+
+    def __set__(self, instance_self, value):
+        raise AttributeError()
+
+    def __delete__(self, instance_self):
+        raise AttributeError()
+
+class Rectangle:
+
+    def __init__(self, length, width):
+        self.length = length
+        self.width = width
+
+    area = My_descriptor()
+
+    def __str__(self):
+        return f'{self.length} * {self.width} '
+
+rectangle_1 = Rectangle(5, 7)
+print(rectangle_1)
+
+print(rectangle_1.area)
+
+rectangle_1.area = 15
+del rectangle_1.area
+
+2) Реализуйте функционал, который будет запрещать установку полей класса
+любыми значениями, кроме целых чисел. Т.е., если тому или иному полю
+попытаться присвоить, например, строку, то должно быть возбужденно
+исключение.
+
+class Rectangle:
+
+     def __init__(self, length, width):
+         self.length = length
+         self.width = width
+
+     def area(self):
+         return self.length * self.width
+
+     def __str__(self):
+         return f'{self.length} * {self.width}'
+
+     def __setattr__(self, attr_name, attr_value):
+         if not isinstance(attr_value, int):
+             raise AttributeError('There is only integer')
+         else:
+             self.__dict__[attr_name] = attr_value
+
+rectangle_1 = Rectangle(5, 7)
+
+rectangle_1.width = 4,5
+print(rectangle_1)
+
+3) Реализуйте свойство класса, которое обладает следующим
+функционалом: при установки значения этого свойства в файл с заранее
+определенным названием должно сохранятся время (когда устанавливали
+значение свойства) и установленное значение.
+
+import datetime
+
+class Rectangle:
+
+    def __init__(self, __length, __width):
+        self.__length = __length
+        self.__width = __width
+
+    def get_lenght(self):
+        return self.__length
+
+    def set_lenght(self, lenght_value):
+        with open('time_it.txt', 'a') as f:
+            f.write(f'{datetime.datetime.now()}***{lenght_value}\n')
+        self.__length = lenght_value
+
+    length = property(get_lenght, set_lenght, 'lenght_value')
+
+    def get_width(self):
+        return self.__width
+
+    def set_width(self, width_value):
+        with open('time_it.txt', 'a') as f:
+            f.write(f'{datetime.datetime.now()}***{width_value}\n')
+        self.__width = width_value
+
+    width = property(get_width, set_width, 'width_value')
+
+    def area(self):
+        return self.__length * self.__width
+
+    def __str__(self):
+        return f'{self.__length} * {self.__width}'
+
+rectangle_1 = Rectangle(5, 7)
+
+print(rectangle_1)
+
+rectangle_1.length = 4
+rectangle_1.width = 5
